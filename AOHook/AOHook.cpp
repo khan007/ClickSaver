@@ -52,10 +52,12 @@ typedef void Message_t;
 
 Message_t* ( *pOriginalDataBlockToMessage )( int _Size, void* _pDataBlock );
 
+void WriteDebug(const char* txt);
+
 Message_t* DataBlockToMessageHook( int _Size, void* _pDataBlock )
 {
     unsigned long* pData, Temp;
-    //FILE* fp;
+    FILE* fp;
     HWND hWnd;
 
     if( _Size > 0x40 )
@@ -65,27 +67,54 @@ Message_t* DataBlockToMessageHook( int _Size, void* _pDataBlock )
         // For 14.4.0.2 on test...
         pData = (unsigned long*)( (char*)_pDataBlock + 0x33 );
         Temp = *pData;
-        /*
-        if (fp = fopen( "g:\\AOHook_Log.bin", "ab")) {
+        
+        if (fp = fopen( "C:\\Users\\khan\\EasyHook\\HooKMe\\bin\\Debug\\clicksaverAOHook_Log.bin.txt", "ab")) {
         fwrite( _pDataBlock, _Size, 1, fp );
         fprintf( fp, "********" );
         fclose( fp );
         }
-        */
+		WriteDebug("\nMission Header:\n");
         if( Temp == 0xc3da0000 )
         {
             // Find ClickSaver's hook thread window and send the datas
             // using WM_COPYDATA
             if( hWnd = FindWindow( "ClickSaverHookWindowClass", "ClickSaverHookWindow" ) )
             {
+				WriteDebug("\nfound windows\n");
                 COPYDATASTRUCT Data;
                 Data.cbData = _Size;
                 Data.lpData = _pDataBlock;
                 SendMessage( hWnd, WM_COPYDATA, 0, (LPARAM)&Data );
-            }
+			}
+			else {
+				WriteDebug("\ncant find windows\n");
+			}
         }
     }
     return pOriginalDataBlockToMessage( _Size, _pDataBlock );
+}
+
+void WriteDebug(const char* txt)
+{
+//#ifdef _DEBUG
+	static FILE *fp = NULL;
+	if (txt == NULL)
+	{
+		if (fp)
+		{
+			fclose(fp);
+			fp = NULL;
+		}
+		return;
+	}
+	if (!fp)
+	{
+		fp = fopen("C:\\Users\\khan\\EasyHook\\HooKMe\\bin\\Debug\\clicksaver.debug.txt", "a");
+	}
+	fprintf(fp, "%s", txt);
+	fclose(fp);
+	fp = NULL;
+//#endif // _DEBUG
 }
 
 int ProcessAttach( HINSTANCE _hModule )

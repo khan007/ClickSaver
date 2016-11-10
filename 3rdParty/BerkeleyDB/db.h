@@ -1693,7 +1693,7 @@ typedef struct entry {
 #if defined(__cplusplus)
 extern "C" {
 #endif
-int db_create __P((DB **, DB_ENV *, u_int32_t));
+int db_create __P((DB **, DB_ENV *, u_int32_t)); 
 char *db_strerror __P((int));
 int db_env_create __P((DB_ENV **, u_int32_t));
 char *db_version __P((int *, int *, int *));

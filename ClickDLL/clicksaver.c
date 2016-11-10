@@ -180,8 +180,8 @@ __declspec(dllexport) int Start()
 			GetFileTime(hLocalDB, NULL, NULL, &LocalTime);
 			GetFileTime(hOrigDB, NULL, NULL, &OrigTime);
 
-			if (CompareFileTime(&OrigTime, &LocalTime) >= 0)
-				bUpdateDB = TRUE;
+			/*if (CompareFileTime(&OrigTime, &LocalTime) >= 0)
+				bUpdateDB = TRUE;*/
 
 			CloseHandle(hOrigDB);
 		}

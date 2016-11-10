@@ -83,6 +83,7 @@
       <TargetMachine>MachineX86</TargetMachine>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
       <IgnoreSpecificDefaultLibraries>libc.lib</IgnoreSpecificDefaultLibraries>
+      <AdditionalOptions>/VERBOSE %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <PostBuildEvent>
       <Command>copy "$(SolutionDir)Deploy\*.*" "$(OutputPath)"</Command>
@@ -125,6 +126,7 @@
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>libc.lib</IgnoreSpecificDefaultLibraries>
+      <AdditionalOptions>/VERBOSE %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <PostBuildEvent>
       <Command>copy "$(SolutionDir)Deploy\*.*" "$(OutputPath)"</Command>
@@ -155,6 +157,9 @@
     <ResourceCompile Include="ClickSaver.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\3rdParty\Detours\Detours.vcxproj">
+      <Project>{a91ec33d-ac2c-4833-ba5c-5124cea3b83b}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\3rdParty\PUL\PUL.vcxproj">
       <Project>{004252e0-c57f-468d-a422-c4fe405903fa}</Project>
     </ProjectReference>
