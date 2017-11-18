@@ -21,6 +21,14 @@ typedef struct
 } MissionItem;
 
 typedef struct
+{	
+	PUU32   Value;
+	PUU32   QL;
+	PUU32   IconKey;
+	PUU8    pName[AODB_MAX_NAME_LEN + 1];
+} MissionItem2;
+
+typedef struct
 {
     pusObjectCollection*    pCol;
     pusObjectCollection*    pSingleCol;
@@ -32,6 +40,36 @@ typedef struct
     MissionItem             Reward;
     PUU8*                   pImageData;
 } MissionClassData;
+
+#pragma pack(1) 
+typedef struct MissionClassData2
+{	
+	unsigned int	IconKey;
+	int	TotalValue;
+	int   Value;
+	int   QL;
+	float	CoordX;
+	float	CoordY;
+	char	CashStr[16];
+	char	XPStr[16];
+	//PUU8	TimeStr[16];
+	char	TypeStr[16];
+	char    pName[AODB_MAX_NAME_LEN + 1];	
+} ;
+//pusObjectCollection*    pCol;
+//pusObjectCollection*    pSingleCol;
+//pusObjectCollection*    pTeamCol;
+//int   Value;
+//int   QL;
+//float	CoordX;
+//float	CoordY;
+//char	CashStr[16];
+//char	XPStr[16];
+////PUU8	TimeStr[16];
+//char	TypeStr[16];
+//char    pName[AODB_MAX_NAME_LEN + 1];
+////MissionItem2             Reward;
+////PUU8*                   pImageData;
 
 typedef struct
 {

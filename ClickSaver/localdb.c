@@ -239,7 +239,7 @@ int ImportRecords( PUU32 _Type )
     }
 
     free( pBuffer );
-    sprintf( ps, "Recorded %u records, %u total size\n", numItems, numBytes );
+    sprintf( ps, "ClickSaver Recorded %u records, %u total size : type %u \n", numItems, numBytes, _Type);
     WriteDebug( ps );
 
     return TRUE;

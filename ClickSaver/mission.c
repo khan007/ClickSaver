@@ -490,7 +490,7 @@ PUU32 MissionParse( PULID _Object, MissionClassData* _pData, PUU8* _pMissionData
     }
 
 #ifdef DEBUG_MISSION_PACKETS // After Descriptions
-    WriteDebug("\nAfter Descriptioins:\n");
+    WriteDebug("\nAfter Descriptions:\n");
     DebugPacket(_pMissionData, 0x24);
     WriteDebug(0);
 #endif
@@ -603,7 +603,6 @@ PUU32 MissionParse( PULID _Object, MissionClassData* _pData, PUU8* _pMissionData
     WriteLog( "mission\t%u\t%u\t%u\t%u\t%s\n", MishID, MishQL, XP, Cash, CharKey );
     WriteLog( "loc\t%u\t%.1f\t%.1f\t%s\n", MishPF, CoordX, CoordY, PFName );
 
-
     // Display items
     for( i = 0; i < NumItems; i++ )
     {
@@ -653,7 +652,7 @@ PUU32 MissionParse( PULID _Object, MissionClassData* _pData, PUU8* _pMissionData
     // Get (and display) find item if any
     if( MissionFind( pDesc, DescLength, TempStr ) )
     {
-        WriteLog( "find\t%s\n", TempStr );
+        WriteLog( "**find\t%s\n", TempStr );
         bItemFound |= SetAndSearch( TempStr, puGetObjectFromCollection( _pData->pCol, FINDITEM ), g_ItemWatchList );
     }
     else
@@ -685,6 +684,70 @@ PUU32 MissionParse( PULID _Object, MissionClassData* _pData, PUU8* _pMissionData
             }
         }
     }
+	HWND hWnd;
+	//MissionClassData2* p2Data;
+	
+	struct MissionClassData2 *x = malloc(sizeof(struct MissionClassData2));
+	if (hWnd = FindWindow("MissionHelperClass", "M"))
+	{
+		WriteDebug("\nfound MissionHelperClass2\n");
+		
+		sprintf(x->CashStr, "%u", Cash);		
+		sprintf(x->XPStr, "%u", XP);
+
+		WriteLog("missioni \t%u\t%u\t%u\t%u\t%s\n", MishID, MishQL, XP, Cash, CharKey);
+		WriteLog("loci \t%u\t%.1f\t%.1f\t%s\n", MishPF, CoordX, CoordY, PFName);
+		x->QL = MishQL;		
+		strcpy(x->pName, PFName);
+		x->CoordX = CoordX;
+		x->CoordY = CoordY;
+		
+		x->IconKey = _pData->Reward.IconKey;
+		x->Value = _pData->Reward.Value;
+
+		x->Reward.IconKey = _pData->Reward.IconKey;
+		//x->Reward.pName = _pData->Reward.pName;
+
+		sprintf(x->Reward.pName, "%u", _pData->Reward.pName);
+		x->Reward.QL = _pData->Reward.QL;
+		x->Reward.Value = TotalValue;
+
+		switch (TempVal)
+		{
+		case 0x2c4e:
+			sprintf(TempStr, "Repair");			
+			break;
+
+		case 0x2c41:
+			sprintf(TempStr, "Return Item");
+		
+			break;
+
+		case 0x2c47:
+			sprintf(TempStr, "Find Person");
+			
+			break;
+
+		case 0x2c49:
+			sprintf(TempStr, "Find Item");
+			
+			break;
+
+		case 0x2c42:
+			sprintf(TempStr, "Kill Person");
+			
+			break;
+		}
+		sprintf(x->TypeStr, "%s", TempStr);
+
+		//COPYDATASTRUCT Data;
+		/*Data.cbData = _Size;
+		Data.lpData = _pDataBlock;*/
+		SendMessage(hWnd, 100, 0, (LPARAM)x);
+	}
+	else {
+		WriteDebug("\ncant find MissionHelperClass2\n");
+	}
 
     return (PUU32)_pMissionData;
 }
@@ -1222,7 +1285,7 @@ PUU8 *GetAOIconData( unsigned long lIconNo )
     char strChunkID[ 5 ];
     udtPNGihdr_struc *udtPNGihdr;
     udtPNGsbit_struc *udtPNGsbit;
-    //FILE *fpDebug;
+    FILE *fpDebug;
     PUU8* pImageData = NULL;
     PUU8* pTmp;
 
@@ -1249,15 +1312,17 @@ PUU8 *GetAOIconData( unsigned long lIconNo )
     /* Write PNG icon to file */
     
     //if( lDebug & DBG_ICN )
-   /* {
-        sprintf( strDebugFile, "%sDebug_IconsPNG.DAT", strAOMDPath );
-        File* fpDebug = fopen( strDebugFile, "a+b" );
+   /* {*/
+	char strDebugFile[250];
+	char strAOMDPath[250] = "c:\\ap\\";
+        sprintf( strDebugFile, "%sDebug_IconsPNG-%d.png", strAOMDPath, lIconNo);
+        fpDebug = fopen( strDebugFile, "a+b" );
         fwrite( a_xPNG, sizeof( PUU8 ), lPNGLen, fpDebug );
         fwrite( "****************", sizeof( char ), 0x10 - ( lPNGLen % 0x10 ),
                 fpDebug );
         fwrite( "****************", sizeof( char ), 0x10, fpDebug );
         fclose( fpDebug );
-    }*/
+    /*}*/
     
 
     /* Check IHDR chunk - Start of PNG, contains icon properties */

@@ -15,7 +15,7 @@ extern CLICKDLL_API int nClickDLL=0;
 // This is an example of an exported function.
 extern CLICKDLL_API int fnClickDLL()
 {
-	string strMytestString("hello world");
+	/*string strMytestString("hello world");
 	cout << strMytestString;
 
 	OutputDebugStringW(L"My output string.");
@@ -23,7 +23,7 @@ extern CLICKDLL_API int fnClickDLL()
 	AllocConsole();
 	freopen("CONIN$", "r", stdin);
 	freopen("CONOUT$", "w", stdout);
-	freopen("CONOUT$", "w", stderr);
+	freopen("CONOUT$", "w", stderr);*/
 
 	Start();
     return 42;

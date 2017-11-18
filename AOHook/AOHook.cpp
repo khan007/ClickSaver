@@ -37,6 +37,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 void*   g_pDataBlockToMessage = NULL;
 
+BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam);
+
+
 // According to this documention of VC++ name-mangling
 // http://www.kegel.com/mangle.html:
 //
@@ -68,19 +71,22 @@ Message_t* DataBlockToMessageHook( int _Size, void* _pDataBlock )
         pData = (unsigned long*)( (char*)_pDataBlock + 0x33 );
         Temp = *pData;
         
-        if (fp = fopen( "C:\\Users\\khan\\EasyHook\\HooKMe\\bin\\Debug\\clicksaverAOHook_Log.bin.txt", "ab")) {
+       /* if (fp = fopen( "clicksaverAOHook_Log.bin.txt", "ab")) {
         fwrite( _pDataBlock, _Size, 1, fp );
         fprintf( fp, "********" );
         fclose( fp );
-        }
-		WriteDebug("\nMission Header:\n");
+        }*/
+		////WriteDebug("\nMission Header ****:\n");
+		//WriteDebug("\nEnumWindowsProc:\n");
+		//EnumWindows(EnumWindowsProc, NULL);
         if( Temp == 0xc3da0000 )
         {
+			////WriteDebug("\ntemp ****:\n");
             // Find ClickSaver's hook thread window and send the datas
             // using WM_COPYDATA
             if( hWnd = FindWindow( "ClickSaverHookWindowClass", "ClickSaverHookWindow" ) )
             {
-				WriteDebug("\nfound windows\n");
+				////WriteDebug("\nfound windows\n");
                 COPYDATASTRUCT Data;
                 Data.cbData = _Size;
                 Data.lpData = _pDataBlock;
@@ -89,10 +95,73 @@ Message_t* DataBlockToMessageHook( int _Size, void* _pDataBlock )
 			else {
 				WriteDebug("\ncant find windows\n");
 			}
+
+			/*if (hWnd = FindWindow("MissionHelperClass", "M"))
+			{
+				WriteDebug("\nfound MissionHelperClass\n");
+				COPYDATASTRUCT Data;
+				Data.cbData = _Size;
+				Data.lpData = _pDataBlock;
+				SendMessage(hWnd, WM_COPYDATA, 0, (LPARAM)&Data);			}
+			else {
+				WriteDebug("\ncant find MissionHelperClass\n");
+			}*/
         }
     }
     return pOriginalDataBlockToMessage( _Size, _pDataBlock );
 }
+
+
+
+BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam)
+{
+	char class_name[80];
+	char title[80];
+	GetClassName(hwnd, class_name, sizeof(class_name));
+	GetWindowText(hwnd, title, sizeof(title));
+	char message[80];
+	try {
+		FILE* fp;
+		if (fp = fopen("clicksaverAOHook_Log.log.txt", "a")) {
+			fprintf(fp, "class_name : %s\n", class_name);
+			fprintf(fp, "title : %s\n", title);
+			fprintf(fp, "********\n");
+			fclose(fp);
+		}
+
+	}
+	catch (...){}
+	/*WriteDebug(class_name);
+	sprintf(message, "\nfound windows %s\n", title);
+	WriteDebug(message);
+	sprintf(message, "\nclass_name %s\n", class_name);
+	WriteDebug(message);*/
+
+	return TRUE;
+}
+
+//
+//BOOL CALLBACK FindTheDesiredWnd(HWND hWnd, LPARAM lParam)
+//{
+//	
+//		if (hWnd is the one you want)
+//		{
+//			((HWND*)lParam)* = hWnd;
+//			return FALSE; // stop enumerating
+//		}
+//	return TRUE; // keep enumerating
+//}
+//
+//int _tmain(int argc, _TCHAR* argv[])
+//{
+//	HWND hFoundWnd = NULL;
+//	::EnumWindows(&FindTheDesiredWnd, (LPARAM)&hFoundWnd);
+//	if (hFoundWnd != NULL)
+//	{
+//		
+//	}
+//	return 0;
+//}
 
 void WriteDebug(const char* txt)
 {
@@ -109,7 +178,7 @@ void WriteDebug(const char* txt)
 	}
 	if (!fp)
 	{
-		fp = fopen("C:\\Users\\khan\\EasyHook\\HooKMe\\bin\\Debug\\clicksaver.debug.txt", "a");
+		fp = fopen("clicksaver.debug.txt", "a");
 	}
 	fprintf(fp, "%s", txt);
 	fclose(fp);

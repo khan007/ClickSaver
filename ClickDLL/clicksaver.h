@@ -117,7 +117,8 @@ extern PUU8 g_bFullscreen;
 #if defined(__cplusplus)
 extern "C" {
 #endif
-__declspec(dllexport) int Start();
+__declspec(dllexport) int Start(int windows, char className[256]);
+__declspec(dllexport) int TestDB();
 #if defined(__cplusplus)
 }
 #endif

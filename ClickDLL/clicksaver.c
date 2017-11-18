@@ -31,6 +31,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "clicksaver.h"
 #include "resource.h"
 #include "AODB/AODB.h"
+#include "sqlite3.h"
 
 #include "BerkeleyDB/db.h"
 
@@ -75,7 +76,6 @@ DWORD WINAPI HookManagerThread( void *pParam );
 
 DB* g_pDB = NULL;
 
-
 typedef enum ImportSettingsMode
 {
     ISM_CONFIG,
@@ -88,12 +88,116 @@ typedef enum ImportSettingsMode
 
 int main( int argc, char** argv )
 {
-	Start();
+	Start(0, "");
     return 0;
 }
 
+_declspec(dllexport) int TestDB()
+{
+	sqlite3 *db;
+	char *zErrMsg = 0;
+	int rc;
 
-__declspec(dllexport) int Start()
+	rc = sqlite3_open("test.db", &db);
+
+	if (rc) {
+		fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
+		return(0);
+	}
+	else {
+		fprintf(stderr, "Opened database successfully\n");
+	}
+	sqlite3_close(db);
+	return 1;
+}
+
+static int callback(void *NotUsed, int argc, char **argv, char **azColName) {
+	int i;
+	for (i = 0; i<argc; i++) {
+		printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");
+	}
+	printf("\n");
+	return 0;
+}
+
+_declspec(dllexport) int CreateTable() 
+{
+	sqlite3 *db;
+	char *zErrMsg = 0;
+	int  rc;
+	char *sql;
+
+	/* Open database */
+	rc = sqlite3_open("test.db", &db);
+	if (rc) {
+		fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
+		return(0);
+	}
+	else {
+		fprintf(stdout, "Opened database successfully\n");
+	}
+
+	/* Create SQL statement */
+	sql = "CREATE TABLE MissionItem("  \
+		"ID INT PRIMARY KEY  AUTOINCREMENT   NOT NULL," \
+		"IconKey           INT    NOT NULL," \
+		"Value           INT    NOT NULL," \
+		"QL           INT    NOT NULL," \
+		"CoordX REAL     NOT NULL," \
+		"CoordY REAL     NOT NULL," \
+		"CashStr           CHAR(50)," \
+		"XPStr           CHAR(50)," \
+		"TypeStr           CHAR(50)," \
+		"Desc         TEXT );";
+
+	/* Execute SQL statement */
+	rc = sqlite3_exec(db, sql, callback, 0, &zErrMsg);
+	if (rc != SQLITE_OK) {
+		fprintf(stderr, "SQL error: %s\n", zErrMsg);
+		sqlite3_free(zErrMsg);
+	}
+	else {
+		fprintf(stdout, "Table created successfully\n");
+	}
+	sqlite3_close(db);
+	return 0;
+}
+
+_declspec(dllexport) int Insert(int IconKey, int Value, int QL, float CoordX, float CoordY, char* CashStr, char* XPStr, char* TypeStr, char* Desc)
+{
+	sqlite3 *db;
+	char *zErrMsg = 0;
+	int rc;
+	char *sql;
+
+	/* Open database */
+	rc = sqlite3_open("test.db", &db);
+	if (rc) {
+		fprintf(stderr, "Can't open database: %s\n", sqlite3_errmsg(db));
+		return(0);
+	}
+	else {
+		fprintf(stderr, "Opened database successfully\n");
+	}
+
+	/* Create SQL statement           1		2  3	4		5		6		7	8		9		*/
+	sql = "INSERT INTO COMPANY (IconKey,Value,QL,CoordX,CoordY,CashStr,XPStr,TypeStr,Desc) "  \
+		"VALUES (%d, %d, %d, %d, %d, %s, %s , %s , %s ); ";
+
+	/* Execute SQL statement */
+	rc = sqlite3_exec(db, sql, callback, 0, &zErrMsg);
+	if (rc != SQLITE_OK) {
+		fprintf(stderr, "SQL error: %s\n", zErrMsg);
+		sqlite3_free(zErrMsg);
+	}
+	else {
+		fprintf(stdout, "Records created successfully\n");
+	}
+	sqlite3_close(db);
+	return 0;
+}
+
+__declspec(dllexport) int Start( int windows, char className[256])
 {
 	pusAppMessage* pAppMsg;
 	void* pMissionData;
@@ -326,8 +430,7 @@ __declspec(dllexport) int Start()
 				}
 				//}
 			}
-
-			if (!g_BuyingAgentCount)
+			else if (!g_BuyingAgentCount)
 			{
 				pMissionData = g_CurrentPacket;
 				puSetAttribute(g_MainWin, PUA_WINDOW_DEFERUPDATE, TRUE);
@@ -1306,8 +1409,8 @@ void WriteLog( const char* Format, ... )
         }
         return;
     }
-    if( PUL_GET_CB( CS_LOG_CB ) )
-    {
+    //if( PUL_GET_CB( CS_LOG_CB ) )
+    //{
         if( !fp )
         {
             fp = fopen( "clicksaver.log", "a" );
@@ -1315,7 +1418,7 @@ void WriteLog( const char* Format, ... )
         va_start( argptr, Format );
         vfprintf( fp, Format, argptr );
         va_end( argptr );
-    }
+    //}
     /**/
 }
 
@@ -1335,7 +1438,7 @@ void WriteDebug( const char* txt )
     }
     if( !fp )
     {
-        fp = fopen( "clicksaver.debug", "a" );
+        fp = fopen( "clicksaver.debug.txt", "a" );
     }
     fprintf( fp, "%s", txt );
 #endif // _DEBUG
