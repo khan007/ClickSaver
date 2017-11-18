@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 
 using System.Windows;
+using WinTest.Infrastructure.Model;
 
 namespace WinTest
 {
@@ -427,7 +428,7 @@ namespace WinTest
 
                 //var resp = fnClickDLL();
                 //System.Diagnostics.Debug.WriteLine(resp);
-                TestDB();
+                //TestDB();
                 Start(0, "");
             }
             catch (DllNotFoundException exx)
@@ -743,14 +744,16 @@ namespace WinTest
         //[StructLayout(LayoutKind.Sequential)]
         public struct MissionClassData2
         {
-            uint IconKey;
-            int TotalValue;
-            int Value;
-            int QL;
-            float CoordX;
-            float CoordY;            
+            public uint IconKey;
+            public int TotalValue;
+            public int Value;
+            public int QL;
+            public float CoordX;
+            public float CoordY;
+            public int Cash;
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 16)]
             public string CashStr;
+            public int XP;
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 16)]
             public string XPStr;
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 16)]
@@ -793,7 +796,7 @@ namespace WinTest
                     break;
 
                 case 100:
-                    var data0 =  Marshal.PtrToStringAnsi(lParam, Marshal.SizeOf(typeof(MissionClassData2)));
+                    var data0 = Marshal.PtrToStringAnsi(lParam, Marshal.SizeOf(typeof(MissionClassData2)));
                     MissionClassData2 test = new MissionClassData2();
 
                     //var v = Marshal.PtrToStructure<MissionClassData2>(lParam);
@@ -801,12 +804,38 @@ namespace WinTest
                     System.Diagnostics.Debug.WriteLine(t);
                     string pointerValue3 = Marshal.PtrToStringAnsi(lParam);
                     string wpointerValue = Marshal.PtrToStringAnsi(wParam);
+                    SaveMissionInfo(t);
+
                     break;
 
                 default:
                     break;
             }
             return DefWindowProc(hWnd, msg, wParam, lParam);
+        }
+
+        private static void SaveMissionInfo(MissionClassData2 t)
+        {
+            using (var db = new DatabaseContext())
+            {
+                var missionInfo = new MissionInfo()
+                {
+                    Cash = t.Cash,
+                    CashStr = t.CashStr,
+                    CoordX = t.CoordX,
+                    CoordY = t.CoordY,
+                    IconKey = t.IconKey,
+                    pName = t.pName,
+                    QL = t.QL,
+                    TotalValue = t.TotalValue,
+                    TypeStr = t.TypeStr,
+                    Value = t.Value,
+                    XP = t.XP,
+                    XPStr = t.XPStr
+                };
+                db.MissionInfo.Add(missionInfo);
+                db.SaveChangesAsync();
+            }
         }
         //private static IntPtr myWndProc(ref Message message)
         ////private static IntPtr myWndProc(IntPtr hWnd, uint msg, IntPtr wParam, IntPtr lParam)

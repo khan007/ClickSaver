@@ -706,6 +706,9 @@ PUU32 MissionParse( PULID _Object, MissionClassData* _pData, PUU8* _pMissionData
 		x->Value = _pData->Reward.Value;		
 		
 		x->TotalValue = TotalValue;
+		x->Cash = Cash;
+		x->Value = x->TotalValue - Cash;
+		
 
 		switch (TempVal)
 		{
@@ -734,6 +737,7 @@ PUU32 MissionParse( PULID _Object, MissionClassData* _pData, PUU8* _pMissionData
 			break;
 		}
 		sprintf(x->TypeStr, "%s", TempStr);
+		x->XP = XP;
 
 		//COPYDATASTRUCT Data;
 		/*Data.cbData = _Size;

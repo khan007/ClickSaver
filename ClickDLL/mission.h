@@ -50,7 +50,9 @@ typedef struct MissionClassData2
 	int   QL;
 	float	CoordX;
 	float	CoordY;
+	int   Cash;
 	char	CashStr[16];
+	int   XP;
 	char	XPStr[16];
 	//PUU8	TimeStr[16];
 	char	TypeStr[16];
